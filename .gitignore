@@ -3,6 +3,15 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Build
+build/
+
+# VS Code
+.vscode/
+
+# vcpkg
+vcpkg_installed/
+
 # User-specific files
 *.rsuser
 *.suo
