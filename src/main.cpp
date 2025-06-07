@@ -1,15 +1,20 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
-// TODO: test out configurations of CMakeLists and vcpkg for development!
+/* ********************************
+GOAL: Render something
+TODO:
+    1) Triangle test
+    2) Load and render model
+******************************** */ 
 
-int main(int, char**){
+int main(int, char**)
+{
     if (!glfwInit())
 	{
         std::cout << "Failed to initialize glfw.\n";
 		return EXIT_FAILURE;
 	}
-    // FIXME: nothing outputs when running...
     std::cout << "glfw success!\n";
 
     glfwTerminate();
