@@ -12,6 +12,10 @@ build/
 # vcpkg
 vcpkg_installed/
 
+# CMake
+CMakeCache.txt
+CMakeFiles/
+
 # User-specific files
 *.rsuser
 *.suo

@@ -7,6 +7,10 @@ add_executable(${PROJECT_NAME}
     "src/main.cpp"
 )
 
+find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE glad::glad
+    PRIVATE glfw
+)
