@@ -14,3 +14,13 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE glad::glad
     PRIVATE glfw
 )
+
+add_custom_target(
+    copy_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${PROJECT_SOURCE_DIR}/shaders"
+    "${PROJECT_BINARY_DIR}/shaders"
+    COMMENT "Copying shader files into binary directory..."
+)
+
+add_dependencies(${PROJECT_NAME} copy_resources)
