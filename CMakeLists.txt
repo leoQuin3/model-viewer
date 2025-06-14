@@ -5,14 +5,17 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/"
 
 add_executable(${PROJECT_NAME} 
     "src/main.cpp"
+    "src/shader.cpp"
 )
 
 find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE glad::glad
     PRIVATE glfw
+    PRIVATE glm::glm
 )
 
 add_custom_target(
