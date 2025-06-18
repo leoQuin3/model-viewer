@@ -8,13 +8,13 @@
 class Shader
 {
 public:
-	GLuint programID;
+	GLuint id;
 
     Shader(std::string VERTEX_SRC_PATH, std::string FRAGMENT_SRC_PATH);
 	~Shader();
 	
 	void use();
-
+	void assignMat4(std::string uniformName, const glm::mat4 &mat4, GLboolean transpose);
 
 private:
 	void printShaderCompileStatus(GLuint id, std::string name);

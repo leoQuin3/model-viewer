@@ -1,9 +1,11 @@
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "shader.h"
 
 Shader::Shader(std::string vertex_src_path, std::string fragment_src_path)
 {
 	// Create program
-	this->programID = glCreateProgram();
+	this->id = glCreateProgram();
 
     // Get shader source code
     std::string vtxCode, fragCode;
@@ -50,10 +52,10 @@ Shader::Shader(std::string vertex_src_path, std::string fragment_src_path)
     printShaderCompileStatus(fragmentShader, "fragment shader");
 
     // Create shader program
-    glAttachShader(this->programID, vertexShader);
-    glAttachShader(this->programID, fragmentShader);
-    glLinkProgram(this->programID);
-    printProgramCompileStatus(this->programID, "SHADER_PROGRAM");
+    glAttachShader(this->id, vertexShader);
+    glAttachShader(this->id, fragmentShader);
+    glLinkProgram(this->id);
+    printProgramCompileStatus(this->id, "SHADER_PROGRAM");
 
     // Clean up shader
     glDeleteShader(vertexShader);
@@ -62,12 +64,18 @@ Shader::Shader(std::string vertex_src_path, std::string fragment_src_path)
 
 Shader::~Shader()
 {
-    glDeleteProgram(this->programID);
+    glDeleteProgram(this->id);
 }
 
 void Shader::use()
 {
-    glUseProgram(this->programID);
+    glUseProgram(this->id);
+}
+
+void Shader::assignMat4(std::string uniformName, const glm::mat4 &mat4, GLboolean transpose)
+{
+    const GLchar* unifName_c = uniformName.c_str();
+    glUniformMatrix4fv(glGetUniformLocation(this->id, unifName_c), 1, transpose, glm::value_ptr(mat4));
 }
 
 void Shader::printShaderCompileStatus(GLuint id, std::string name)
@@ -80,8 +88,6 @@ void Shader::printShaderCompileStatus(GLuint id, std::string name)
         glGetShaderInfoLog(id, 512, NULL, infoLog);
         std::cerr << "ERROR::SHADER::COMPILATION_ERROR: \"" << name << "\"\n" << infoLog << std::endl;
     }
-    else
-        std::clog << "Info::Shader:: \"" << name << "\" ::Compilation success!\n";
 }
 
 void Shader::printProgramCompileStatus(GLuint id, std::string name)
@@ -94,6 +100,4 @@ void Shader::printProgramCompileStatus(GLuint id, std::string name)
         glGetProgramInfoLog(id, 512, NULL, infoLog);
         std::cerr << "ERROR::SHADER_PROGRAM::LINKING_ERROR: \"" << name << "\"\n" << infoLog << std::endl;
     }
-    else
-        std::clog << "Info::Shader_Program:: \"" << name << "\" ::Linking success!\n";
 }

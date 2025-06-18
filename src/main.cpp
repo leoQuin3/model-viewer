@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
 
@@ -62,13 +64,19 @@ int main(int, char**)
 
     // Create shader program
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
+    shaderProgram.use();
 
     while(!glfwWindowShouldClose(window))
     {
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shaderProgram.use();
+        // Transformations
+        glm::mat4 rotateMatrix = glm::mat4(1.0);
+        rotateMatrix = glm::rotate(rotateMatrix, glm::radians(static_cast<float>(glfwGetTime()) * 100.f), glm::vec3(glm::cos(glfwGetTime()), 0.f, glm::sin(glfwGetTime())));
+        
+        // Assign uniform
+        shaderProgram.assignMat4("rotateMat", rotateMatrix, GL_FALSE);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
