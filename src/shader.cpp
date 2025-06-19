@@ -57,7 +57,7 @@ Shader::Shader(std::string vertex_src_path, std::string fragment_src_path)
     glLinkProgram(this->id);
     printProgramCompileStatus(this->id, "SHADER_PROGRAM");
 
-    // Clean up shader
+    // Clean up shaders
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }
@@ -72,7 +72,7 @@ void Shader::use()
     glUseProgram(this->id);
 }
 
-void Shader::assignMat4(std::string uniformName, const glm::mat4 &mat4, GLboolean transpose)
+void Shader::assignMat4(const std::string uniformName, const glm::mat4 &mat4, GLboolean transpose)
 {
     const GLchar* unifName_c = uniformName.c_str();
     glUniformMatrix4fv(glGetUniformLocation(this->id, unifName_c), 1, transpose, glm::value_ptr(mat4));

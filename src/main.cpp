@@ -10,9 +10,13 @@
 
 /*
     TODO: Draw 3D models
-    -   Create camera class
     -   3D cube test
+    -   Create camera class
 */
+
+// TODO: Create vector spaces and introduce camera
+
+unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
 
 int main(int, char**)
 {
@@ -43,9 +47,9 @@ int main(int, char**)
     // Triangle coordinates (NDC)
     float vertices[] = {
         // X, Y, Z          // R, G, B
-        -.5f, -.5f, 0.f,    1.f, 0.f, 0.f,
-         .5f, -.5f, 0.f,    0.f, 1.f, 0.f,
-         0.f,  .5f, 0.f,    0.f, 0.f, 1.f,
+        -.5, -.5, 0.,    1., 0., 0.,
+         .5, -.5, 0.,    0., 1., 0.,
+         0.,  .5, 0.,    0., 0., 1.,
     };
     
     // Buffers
@@ -72,14 +76,18 @@ int main(int, char**)
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Transformations
-        glm::mat4 rotateMatrix = glm::mat4(1.0);
-        rotateMatrix = glm::rotate(rotateMatrix, glm::radians(static_cast<float>(glfwGetTime()) * 100.f), glm::vec3(glm::cos(glfwGetTime()), 0.f, glm::sin(glfwGetTime())));
-        
+        glm::mat4 modelMat = glm::mat4(1.0);
+        modelMat = glm::rotate(
+            modelMat,
+            glm::radians(static_cast<float>(glfwGetTime()) * 100.f),
+            glm::vec3(glm::cos(glfwGetTime()), 0.f, glm::sin(glfwGetTime()))
+        );
+
         // Assign uniform
-        shaderProgram.assignMat4("rotateMat", rotateMatrix, GL_FALSE);
+        shaderProgram.assignMat4("modelMat", modelMat, GL_FALSE);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, getVertCount(sizeof(vertices) / sizeof(float), 6));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -92,4 +100,9 @@ int main(int, char**)
 
     glfwTerminate();
     return EXIT_SUCCESS;
+}
+
+unsigned int getVertCount(unsigned int arrLength, unsigned int stride)
+{
+    return arrLength / stride;
 }

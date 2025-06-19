@@ -4,10 +4,10 @@ layout (location = 1) in vec3 aColor;
 
 out vec4 vertexColor;
 
-uniform mat4 rotateMat;
+uniform mat4 modelMat;
 
 void main()
 {
-    gl_Position = rotateMat * vec4(aPos, 1.0);
+    gl_Position = modelMat * vec4(aPos, 1.0);
     vertexColor = vec4(aColor, 1.0);
 }
