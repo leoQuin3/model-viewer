@@ -4,10 +4,13 @@ layout (location = 1) in vec3 aColor;
 
 out vec4 vertexColor;
 
+// Transformations
 uniform mat4 modelMat;
+uniform mat4 worldMat;
+uniform mat4 projectionMat;
 
 void main()
 {
-    gl_Position = modelMat * vec4(aPos, 1.0);
+    gl_Position = projectionMat * worldMat * modelMat * vec4(aPos, 1.0);
     vertexColor = vec4(aColor, 1.0);
 }

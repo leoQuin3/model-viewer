@@ -9,12 +9,12 @@
 #include "shader.h"
 
 /*
-    TODO: Draw 3D models
-    -   3D cube test
-    -   Create camera class
+    TODO:
+    -   Create camera
 */
 
-// TODO: Create vector spaces and introduce camera
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 800;
 
 unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
 
@@ -29,7 +29,7 @@ int main(int, char**)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 800, "Model Viewer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Model Viewer", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR::Failed to create window.\n";
@@ -44,12 +44,50 @@ int main(int, char**)
         return EXIT_FAILURE;
     }
 
-    // Triangle coordinates (NDC)
+    // Cube coordinates (NDC)
     float vertices[] = {
-        // X, Y, Z          // R, G, B
-        -.5, -.5, 0.,    1., 0., 0.,
-         .5, -.5, 0.,    0., 1., 0.,
-         0.,  .5, 0.,    0., 0., 1.,
+        // X, Y, Z             // R, G, B
+        -0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
+         0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
+         0.5f,  0.5f,  0.5f,   1.f, 0.f, 0.f,
+         0.5f,  0.5f,  0.5f,   1.f, 0.f, 0.f,
+        -0.5f,  0.5f,  0.5f,   1.f, 0.f, 0.f,
+        -0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
+
+        -0.5f, -0.5f, -0.5f,   0.f, 1.f, 0.f,
+        -0.5f,  0.5f, -0.5f,   0.f, 1.f, 0.f,
+         0.5f,  0.5f, -0.5f,   0.f, 1.f, 0.f,
+         0.5f,  0.5f, -0.5f,   0.f, 1.f, 0.f,
+         0.5f, -0.5f, -0.5f,   0.f, 1.f, 0.f,
+        -0.5f, -0.5f, -0.5f,   0.f, 1.f, 0.f,
+
+        -0.5f, -0.5f, -0.5f,   0.f, 0.f, 1.f,
+        -0.5f, -0.5f,  0.5f,   0.f, 0.f, 1.f,
+        -0.5f,  0.5f,  0.5f,   0.f, 0.f, 1.f,
+        -0.5f,  0.5f,  0.5f,   0.f, 0.f, 1.f,
+        -0.5f,  0.5f, -0.5f,   0.f, 0.f, 1.f,
+        -0.5f, -0.5f, -0.5f,   0.f, 0.f, 1.f,
+
+         0.5f, -0.5f, -0.5f,   1.f, 0.f, 1.f,
+         0.5f,  0.5f, -0.5f,   1.f, 0.f, 1.f,
+         0.5f,  0.5f,  0.5f,   1.f, 0.f, 1.f,
+         0.5f,  0.5f,  0.5f,   1.f, 0.f, 1.f,
+         0.5f, -0.5f,  0.5f,   1.f, 0.f, 1.f,
+         0.5f, -0.5f, -0.5f,   1.f, 0.f, 1.f,
+
+        -0.5f,  0.5f, -0.5f,   1.f, 1.f, 0.f,
+        -0.5f,  0.5f,  0.5f,   1.f, 1.f, 0.f,
+         0.5f,  0.5f,  0.5f,   1.f, 1.f, 0.f,
+         0.5f,  0.5f,  0.5f,   1.f, 1.f, 0.f,
+         0.5f,  0.5f, -0.5f,   1.f, 1.f, 0.f,
+        -0.5f,  0.5f, -0.5f,   1.f, 1.f, 0.f,
+
+        -0.5f, -0.5f, -0.5f,   1.f, 1.f, 1.f,
+         0.5f, -0.5f, -0.5f,   1.f, 1.f, 1.f,
+         0.5f, -0.5f,  0.5f,   1.f, 1.f, 1.f,
+         0.5f, -0.5f,  0.5f,   1.f, 1.f, 1.f,
+        -0.5f, -0.5f,  0.5f,   1.f, 1.f, 1.f,
+        -0.5f, -0.5f, -0.5f,   1.f, 1.f, 1.f,
     };
     
     // Buffers
@@ -70,22 +108,38 @@ int main(int, char**)
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
     shaderProgram.use();
 
+    glEnable(GL_DEPTH_TEST);
+
     while(!glfwWindowShouldClose(window))
     {
         glClearColor(0.f, 0.f, 0.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Transformations
+        // Vertex Transformations
         glm::mat4 modelMat = glm::mat4(1.0);
         modelMat = glm::rotate(
             modelMat,
             glm::radians(static_cast<float>(glfwGetTime()) * 100.f),
             glm::vec3(glm::cos(glfwGetTime()), 0.f, glm::sin(glfwGetTime()))
         );
+        glm::mat4 worldMat = glm::mat4(1.0);
+        worldMat = glm::translate(
+            worldMat,
+            glm::vec3(glm::cos(glfwGetTime()), 0, -3)
+        );
+        glm::mat4 projectionMat = glm::mat4(1.0);
+        projectionMat = glm::perspective(
+            glm::radians(45.f),
+            static_cast<float>(WINDOW_WIDTH) / (WINDOW_HEIGHT),
+            0.1f, 100.0f
+        );
 
-        // Assign uniform
+        // Assign uniforms
         shaderProgram.assignMat4("modelMat", modelMat, GL_FALSE);
+        shaderProgram.assignMat4("worldMat", worldMat, GL_FALSE);
+        shaderProgram.assignMat4("projectionMat", projectionMat, GL_FALSE);
 
+        // Draw object
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, getVertCount(sizeof(vertices) / sizeof(float), 6));
 
