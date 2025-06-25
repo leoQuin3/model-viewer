@@ -7,10 +7,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
+#include "camera.h"
 
 /*
-    TODO:
-    -   Create camera
+    TODO: Create "arcball" movement
+    -   Get input from mouse (click and drag)
+    -   Orbit camera around object
 */
 
 const int WINDOW_WIDTH = 800;
@@ -108,6 +110,10 @@ int main(int, char**)
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
     shaderProgram.use();
 
+    // Camera
+    Camera camera = Camera(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+
+    // Enable properties
     glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(window))
@@ -115,18 +121,15 @@ int main(int, char**)
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Vertex Transformations
+        // Camera movement
+        const float distance = 3.f;
+        camera.position = glm::vec3(glm::cos(glfwGetTime()) * distance, 0, glm::sin(glfwGetTime()) * distance);
+        camera.lookAtPosition(glm::vec3(0));
+
+        // Vertex transformations
         glm::mat4 modelMat = glm::mat4(1.0);
-        modelMat = glm::rotate(
-            modelMat,
-            glm::radians(static_cast<float>(glfwGetTime()) * 100.f),
-            glm::vec3(glm::cos(glfwGetTime()), 0.f, glm::sin(glfwGetTime()))
-        );
         glm::mat4 worldMat = glm::mat4(1.0);
-        worldMat = glm::translate(
-            worldMat,
-            glm::vec3(glm::cos(glfwGetTime()), 0, -3)
-        );
+        glm::mat4 viewMat = camera.getViewMatrix();
         glm::mat4 projectionMat = glm::mat4(1.0);
         projectionMat = glm::perspective(
             glm::radians(45.f),
@@ -137,6 +140,7 @@ int main(int, char**)
         // Assign uniforms
         shaderProgram.assignMat4("modelMat", modelMat, GL_FALSE);
         shaderProgram.assignMat4("worldMat", worldMat, GL_FALSE);
+        shaderProgram.assignMat4("viewMat", viewMat, GL_FALSE);
         shaderProgram.assignMat4("projectionMat", projectionMat, GL_FALSE);
 
         // Draw object

@@ -6,6 +6,7 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/"
 add_executable(${PROJECT_NAME} 
     "src/main.cpp"
     "src/shader.cpp"
+    "src/camera.cpp"
 )
 
 find_package(glad CONFIG REQUIRED)
