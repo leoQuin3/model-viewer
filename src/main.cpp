@@ -10,18 +10,43 @@
 #include "camera.h"
 
 /*
-    TODO: Create "arcball" movement
-    -   Get input from mouse (click and drag)
-    -   Orbit camera around object
+    TODO: Import 3D model
+    -   Use assimp to get vertices
+    -   Buffer model
+    -   Render it
 */
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
+const glm::vec3 WORLD_ORIGIN = glm::vec3(0);
 
+float lastMouseX = WINDOW_WIDTH / 2.;
+float lastMouseY = WINDOW_HEIGHT / 2.;
+
+// Camera
+const float MAX_RADIUS = 15.f;
+const float MIN_RADIUS = .5f;
+const float DEFAULT_RADIUS = 4.f;
+
+Camera camera = Camera(glm::vec3(WORLD_ORIGIN.x, WORLD_ORIGIN.y, WORLD_ORIGIN.z), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+
+bool cursorFirstEntered = true;
+float radius = DEFAULT_RADIUS;
+float elevationAngle = 0.f;
+float azimuthAngle = 0.f;
+
+// Prototypes
 unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
+void orbit_camera(const float theta, const float phi, const glm::vec3 target);
+
+// Callback functions
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main(int, char**)
 {
+    // Initialize OpenGL
     if (!glfwInit())
 	{
         std::cout << "ERROR::Failed to initialize glfw.\n";
@@ -46,7 +71,12 @@ int main(int, char**)
         return EXIT_FAILURE;
     }
 
-    // Cube coordinates (NDC)
+    // Register callback functions
+    glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
+
+    // Cube vertices (NDC)
     float vertices[] = {
         // X, Y, Z             // R, G, B
         -0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
@@ -110,32 +140,24 @@ int main(int, char**)
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
     shaderProgram.use();
 
-    // Camera
-    Camera camera = Camera(glm::vec3(0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-
     // Enable properties
     glEnable(GL_DEPTH_TEST);
+    camera.mouseSensitivity = 0.005f;
 
-    while(!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Camera movement
-        const float distance = 3.f;
-        camera.position = glm::vec3(glm::cos(glfwGetTime()) * distance, 0, glm::sin(glfwGetTime()) * distance);
-        camera.lookAtPosition(glm::vec3(0));
+        // Update camera
+        orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN);
 
         // Vertex transformations
         glm::mat4 modelMat = glm::mat4(1.0);
         glm::mat4 worldMat = glm::mat4(1.0);
         glm::mat4 viewMat = camera.getViewMatrix();
         glm::mat4 projectionMat = glm::mat4(1.0);
-        projectionMat = glm::perspective(
-            glm::radians(45.f),
-            static_cast<float>(WINDOW_WIDTH) / (WINDOW_HEIGHT),
-            0.1f, 100.0f
-        );
+        projectionMat = glm::perspective(glm::radians(45.f), static_cast<float>(WINDOW_WIDTH) / (WINDOW_HEIGHT), 0.1f, 100.0f);
 
         // Assign uniforms
         shaderProgram.assignMat4("modelMat", modelMat, GL_FALSE);
@@ -160,7 +182,63 @@ int main(int, char**)
     return EXIT_SUCCESS;
 }
 
+// Count vertices in an array
 unsigned int getVertCount(unsigned int arrLength, unsigned int stride)
 {
     return arrLength / stride;
+}
+
+// Rotate camera by dragging
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    float xOffset = static_cast<float>(xpos) - lastMouseX;
+    float yOffset = lastMouseY - static_cast<float>(ypos);
+
+    lastMouseX = static_cast<float>(xpos);
+    lastMouseY = static_cast<float>(ypos);
+    
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
+        azimuthAngle -= xOffset * camera.mouseSensitivity;
+        elevationAngle -= yOffset * camera.mouseSensitivity;
+
+        if (elevationAngle >= glm::radians(90.f))
+            elevationAngle = glm::radians(90.f);
+        else if (elevationAngle <= glm::radians(-90.f))
+            elevationAngle = glm::radians(-90.f);
+    }
+}
+
+// Zoom by scrolling
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{   
+    radius -= yoffset * 0.5f;
+
+    if (radius > MAX_RADIUS)
+        radius = MAX_RADIUS;
+    else if (radius < MIN_RADIUS)
+        radius = MIN_RADIUS;
+}
+
+// Reset to default position
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_R)
+    {
+        elevationAngle = 0.f;
+        azimuthAngle = 0.f;
+        radius = DEFAULT_RADIUS;
+    }
+}
+
+// Set camera position and orientation
+void orbit_camera(const float theta, const float phi, const glm::vec3 target)
+{
+    camera.position.x = radius * glm::cos(theta) * glm::sin(phi);
+    camera.position.y = radius * glm::sin(theta);
+    camera.position.z = radius * glm::cos(theta) * glm::cos(phi);
+    
+    camera.position += target;
+
+    camera.lookAtPosition(target);
 }
