@@ -41,10 +41,13 @@ class Camera
     void processMouseScroll(float yoffset);
 
     // Methods
-    void lookAtPosition(glm::vec3 position);
+    float getSpeed() const;
     glm::mat4 getViewMatrix() const;
     glm::vec3 getFront() const;
-    float getSpeed() const;
+    glm::vec3 getRight() const;
+    glm::vec3 getUp() const;
+
+    void lookAtPosition(glm::vec3 position);
 
     private:
 

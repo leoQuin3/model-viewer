@@ -16,24 +16,26 @@
     -   Render it
 */
 
+// Window and cursor properties
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
-const glm::vec3 WORLD_ORIGIN = glm::vec3(0);
 
 float lastMouseX = WINDOW_WIDTH / 2.;
 float lastMouseY = WINDOW_HEIGHT / 2.;
+bool cursorFirstEntered = true;
 
 // Camera
 const float MAX_RADIUS = 15.f;
 const float MIN_RADIUS = .5f;
 const float DEFAULT_RADIUS = 4.f;
-
-Camera camera = Camera(glm::vec3(WORLD_ORIGIN.x, WORLD_ORIGIN.y, WORLD_ORIGIN.z), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-
-bool cursorFirstEntered = true;
 float radius = DEFAULT_RADIUS;
 float elevationAngle = 0.f;
 float azimuthAngle = 0.f;
+
+const glm::vec3 WORLD_ORIGIN(0);
+glm::vec3 panOffset(0.f);
+
+Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
 
 // Prototypes
 unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
@@ -150,7 +152,7 @@ int main(int, char**)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Update camera
-        orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN);
+        orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
 
         // Vertex transformations
         glm::mat4 modelMat = glm::mat4(1.0);
@@ -189,6 +191,7 @@ unsigned int getVertCount(unsigned int arrLength, unsigned int stride)
 }
 
 // Rotate camera by dragging
+// FIXME: Camera rotating fine and smooth at 90 degrees, but snappy after panning
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
     float xOffset = static_cast<float>(xpos) - lastMouseX;
@@ -199,13 +202,23 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
     
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
-        azimuthAngle -= xOffset * camera.mouseSensitivity;
-        elevationAngle -= yOffset * camera.mouseSensitivity;
+        // Panning
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        {
+            panOffset -= (camera.getUp() * yOffset + camera.getRight() * xOffset) * camera.mouseSensitivity;
+        }
 
-        if (elevationAngle >= glm::radians(90.f))
-            elevationAngle = glm::radians(90.f);
-        else if (elevationAngle <= glm::radians(-90.f))
-            elevationAngle = glm::radians(-90.f);
+        // Rotation
+        else
+        {
+            azimuthAngle -= xOffset * camera.mouseSensitivity;
+            elevationAngle -= yOffset * camera.mouseSensitivity;
+
+            if (elevationAngle >= glm::radians(90.f))
+                elevationAngle = glm::radians(90.f);
+            else if (elevationAngle <= glm::radians(-90.f))
+                elevationAngle = glm::radians(-90.f);
+        }
     }
 }
 
@@ -228,6 +241,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         elevationAngle = 0.f;
         azimuthAngle = 0.f;
         radius = DEFAULT_RADIUS;
+        panOffset = glm::vec3(0);
     }
 }
 

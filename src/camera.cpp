@@ -92,6 +92,16 @@ glm::vec3 Camera::getFront() const
     return front;
 }
 
+glm::vec3 Camera::getRight() const
+{
+    return this->right;
+}
+
+glm::vec3 Camera::getUp() const
+{
+    return this->up;
+}
+
 float Camera::getSpeed() const
 {
     if (isSprinting)
