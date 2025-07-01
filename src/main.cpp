@@ -25,6 +25,8 @@ float lastMouseY = WINDOW_HEIGHT / 2.;
 bool cursorFirstEntered = true;
 
 // Camera
+const float MAX_ELEVATION = 89.9f;
+const float MIN_ELEVATION = -89.9f;
 const float MAX_RADIUS = 15.f;
 const float MIN_RADIUS = .5f;
 const float DEFAULT_RADIUS = 4.f;
@@ -214,10 +216,10 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
             azimuthAngle -= xOffset * camera.mouseSensitivity;
             elevationAngle -= yOffset * camera.mouseSensitivity;
 
-            if (elevationAngle >= glm::radians(90.f))
-                elevationAngle = glm::radians(90.f);
-            else if (elevationAngle <= glm::radians(-90.f))
-                elevationAngle = glm::radians(-90.f);
+            if (elevationAngle >= glm::radians(MAX_ELEVATION))
+                elevationAngle = glm::radians(MAX_ELEVATION);
+            else if (elevationAngle <= glm::radians(MIN_ELEVATION))
+                elevationAngle = glm::radians(MIN_ELEVATION);
         }
     }
 }
