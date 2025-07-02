@@ -3,17 +3,7 @@
 
 Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up) : position(position), front(front), up(up), worldUp(up)
 {
-    updateCameraVectors();
-}
-
-Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, glm::vec3 worldUp) : position(position), front(front), up(up), worldUp(worldUp)
-{
-    updateCameraVectors();
-}
-
-Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, float yaw, float pitch, float movementSpeed, float mouseSensitivity) : position(position), front(front), up(up), yaw(yaw), pitch(pitch), movementSpeed(movementSpeed), mouseSensitivity(mouseSensitivity)
-{
-    updateCameraVectors();
+    updateCameraVectors(front);
 }
 
 void Camera::processKeyboard(Camera_Movement direction, float deltaTime)
@@ -64,10 +54,7 @@ void Camera::processMouseScroll(float yoffset)
 void Camera::lookAtPosition(glm::vec3 position)
 {
     glm::vec3 lookDir = glm::normalize(position - this->position);
-    this->pitch = glm::degrees(glm::asin(lookDir.y));
-    this->yaw = glm::degrees(glm::atan(lookDir.z, lookDir.x));
-    
-    updateCameraVectors();
+    updateCameraVectors(lookDir);
 }
 
 glm::mat4 Camera::getViewMatrix() const
@@ -118,4 +105,14 @@ void Camera::updateCameraVectors()
     front = glm::normalize(front);
     right = glm::normalize(glm::cross(front, worldUp));
     up = glm::normalize(glm::cross(right, front));
+}
+
+void Camera::updateCameraVectors(glm::vec3 front)
+{
+    this->front = glm::normalize(front);
+    right = glm::normalize(glm::cross(this->front, worldUp));
+    up = glm::normalize(glm::cross(right, this->front));
+
+    pitch = asin(this->front.y);
+    yaw = atan2f(this->front.x, this->front.z);
 }

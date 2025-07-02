@@ -25,8 +25,8 @@ float lastMouseY = WINDOW_HEIGHT / 2.;
 bool cursorFirstEntered = true;
 
 // Camera
-const float MAX_ELEVATION = 89.9f;
-const float MIN_ELEVATION = -89.9f;
+const float MAX_ELEVATION = 89.99f;
+const float MIN_ELEVATION = -89.99f;
 const float MAX_RADIUS = 15.f;
 const float MIN_RADIUS = .5f;
 const float DEFAULT_RADIUS = 4.f;
@@ -37,7 +37,7 @@ float azimuthAngle = 0.f;
 const glm::vec3 WORLD_ORIGIN(0);
 glm::vec3 panOffset(0.f);
 
-Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(1, 0, -1), glm::vec3(0, 1, 0));
 
 // Prototypes
 unsigned int getVertCount(unsigned int arrLength, unsigned int stride);

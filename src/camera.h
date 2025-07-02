@@ -32,8 +32,6 @@ class Camera
     
     // Constructors
     Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up);
-    Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, glm::vec3 worldUp);
-    Camera(glm::vec3 position, glm::vec3 front, glm::vec3 up, float yaw, float pitch, float movementSpeed, float mouseSensitivity);
     
     // Callback functions
     void processKeyboard(Camera_Movement direction, float deltaTime);
@@ -62,6 +60,7 @@ class Camera
     float maxSpeed = 6.f;
     
     // Reconstruct vectors
-    void updateCameraVectors();
+    void Camera::updateCameraVectors();
+    void Camera::updateCameraVectors(glm::vec3 front);
 };
 #endif
