@@ -5,6 +5,9 @@
 #include <sstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 #include "shader.h"
 #include "camera.h"
@@ -193,7 +196,7 @@ unsigned int getVertCount(unsigned int arrLength, unsigned int stride)
 }
 
 // Rotate camera by dragging
-// FIXME: Camera rotating fine and smooth at 90 degrees, but snappy after panning
+// FIXME: Camera rotating fine and smooth at 90 degrees, but snappy after panning. Check Camera's 'updateCameraVectors' method.
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
     float xOffset = static_cast<float>(xpos) - lastMouseX;
@@ -227,7 +230,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 // Zoom by scrolling
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {   
-    radius -= yoffset * 0.5f;
+    radius -= static_cast<float>(yoffset) * 0.5f;
 
     if (radius > MAX_RADIUS)
         radius = MAX_RADIUS;
