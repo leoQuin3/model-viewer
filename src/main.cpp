@@ -5,12 +5,10 @@
 #include <sstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #include "shader.h"
 #include "camera.h"
+#include "mesh.h"
 
 /*
     TODO: Import 3D model
@@ -82,6 +80,8 @@ int main(int, char**)
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
+
+    Mesh bunnyMesh;
 
     // Cube vertices (NDC)
     float vertices[] = {
