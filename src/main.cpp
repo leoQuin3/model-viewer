@@ -81,67 +81,14 @@ int main(int, char**)
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 
-    Mesh bunnyMesh;
+    // Triangle test (in 3D!)
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices{0, 1, 2};
+    vertices.push_back(Vertex{glm::vec3( .0f,  .5f, 0.f), glm::vec3(1.f, 0.f, 0.f)});
+    vertices.push_back(Vertex{glm::vec3( .5f, -.5f, 0.f), glm::vec3(0.f, 1.f, 0.f)});
+    vertices.push_back(Vertex{glm::vec3(-.5f, -.5f, 0.f), glm::vec3(0.f, 0.f, 1.f)});
 
-    // Cube vertices (NDC)
-    float vertices[] = {
-        // X, Y, Z             // R, G, B
-        -0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
-         0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
-         0.5f,  0.5f,  0.5f,   1.f, 0.f, 0.f,
-         0.5f,  0.5f,  0.5f,   1.f, 0.f, 0.f,
-        -0.5f,  0.5f,  0.5f,   1.f, 0.f, 0.f,
-        -0.5f, -0.5f,  0.5f,   1.f, 0.f, 0.f,
-
-        -0.5f, -0.5f, -0.5f,   0.f, 1.f, 0.f,
-        -0.5f,  0.5f, -0.5f,   0.f, 1.f, 0.f,
-         0.5f,  0.5f, -0.5f,   0.f, 1.f, 0.f,
-         0.5f,  0.5f, -0.5f,   0.f, 1.f, 0.f,
-         0.5f, -0.5f, -0.5f,   0.f, 1.f, 0.f,
-        -0.5f, -0.5f, -0.5f,   0.f, 1.f, 0.f,
-
-        -0.5f, -0.5f, -0.5f,   0.f, 0.f, 1.f,
-        -0.5f, -0.5f,  0.5f,   0.f, 0.f, 1.f,
-        -0.5f,  0.5f,  0.5f,   0.f, 0.f, 1.f,
-        -0.5f,  0.5f,  0.5f,   0.f, 0.f, 1.f,
-        -0.5f,  0.5f, -0.5f,   0.f, 0.f, 1.f,
-        -0.5f, -0.5f, -0.5f,   0.f, 0.f, 1.f,
-
-         0.5f, -0.5f, -0.5f,   1.f, 0.f, 1.f,
-         0.5f,  0.5f, -0.5f,   1.f, 0.f, 1.f,
-         0.5f,  0.5f,  0.5f,   1.f, 0.f, 1.f,
-         0.5f,  0.5f,  0.5f,   1.f, 0.f, 1.f,
-         0.5f, -0.5f,  0.5f,   1.f, 0.f, 1.f,
-         0.5f, -0.5f, -0.5f,   1.f, 0.f, 1.f,
-
-        -0.5f,  0.5f, -0.5f,   1.f, 1.f, 0.f,
-        -0.5f,  0.5f,  0.5f,   1.f, 1.f, 0.f,
-         0.5f,  0.5f,  0.5f,   1.f, 1.f, 0.f,
-         0.5f,  0.5f,  0.5f,   1.f, 1.f, 0.f,
-         0.5f,  0.5f, -0.5f,   1.f, 1.f, 0.f,
-        -0.5f,  0.5f, -0.5f,   1.f, 1.f, 0.f,
-
-        -0.5f, -0.5f, -0.5f,   1.f, 1.f, 1.f,
-         0.5f, -0.5f, -0.5f,   1.f, 1.f, 1.f,
-         0.5f, -0.5f,  0.5f,   1.f, 1.f, 1.f,
-         0.5f, -0.5f,  0.5f,   1.f, 1.f, 1.f,
-        -0.5f, -0.5f,  0.5f,   1.f, 1.f, 1.f,
-        -0.5f, -0.5f, -0.5f,   1.f, 1.f, 1.f,
-    };
-    
-    // Buffers
-    GLuint VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    Mesh mesh(vertices, indices);
 
     // Create shader program
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
@@ -173,8 +120,7 @@ int main(int, char**)
         shaderProgram.assignMat4("projectionMat", projectionMat, GL_FALSE);
 
         // Draw object
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, getVertCount(sizeof(vertices) / sizeof(float), 6));
+        mesh.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -182,17 +128,8 @@ int main(int, char**)
 
     std::cout << "success!\n";
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-
     glfwTerminate();
     return EXIT_SUCCESS;
-}
-
-// Count vertices in an array
-unsigned int getVertCount(unsigned int arrLength, unsigned int stride)
-{
-    return arrLength / stride;
 }
 
 // Rotate camera by dragging

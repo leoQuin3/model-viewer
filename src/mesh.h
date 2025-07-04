@@ -1,30 +1,27 @@
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
 
-/*
-	TODO: Create Mesh class that loads a mesh and stores vertices.
-	INPUT: A file
-	OUTPUT: vertices and indices
-*/
-
-// Consecutive set of attributes.
+// A set of attributes that define a vertex.
 struct Vertex
 {
 	glm::vec3 position;
 	glm::vec3 normal;
 };
 
-// A data structure which holds data ready for buffering in OpenGL.
+// A data structure which holds vertices ready to be drawn by OpenGL.
 class Mesh
 {
 public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 
-	Mesh(const std::string FILE_PATH);
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
+	~Mesh();
 
 	void draw();
 
 private:
-	void processNode();
+	GLuint VAO, VBO, EBO;
+	void initializeBuffers();
 };

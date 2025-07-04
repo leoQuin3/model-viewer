@@ -60,7 +60,7 @@ class Camera
     float maxSpeed = 6.f;
     
     // Reconstruct vectors
-    void Camera::updateCameraVectors();
-    void Camera::updateCameraVectors(glm::vec3 front);
+    void updateCameraVectors();
+    void updateCameraVectors(glm::vec3 front);
 };
 #endif
