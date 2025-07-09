@@ -1,6 +1,9 @@
+#pragma once
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include "shader.h"
 
 // A set of attributes that define a vertex.
 struct Vertex

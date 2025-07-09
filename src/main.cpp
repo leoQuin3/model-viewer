@@ -1,14 +1,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
+#include "model.h"
 
 /*
     TODO: Import 3D model
@@ -81,14 +82,8 @@ int main(int, char**)
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 
-    // Triangle test (in 3D!)
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices{0, 1, 2};
-    vertices.push_back(Vertex{glm::vec3( .0f,  .5f, 0.f), glm::vec3(1.f, 0.f, 0.f)});
-    vertices.push_back(Vertex{glm::vec3( .5f, -.5f, 0.f), glm::vec3(0.f, 1.f, 0.f)});
-    vertices.push_back(Vertex{glm::vec3(-.5f, -.5f, 0.f), glm::vec3(0.f, 0.f, 1.f)});
-
-    Mesh mesh(vertices, indices);
+    // 3D Bunny
+    Model bunny("assets/StanfordBunny.glb");
 
     // Create shader program
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
@@ -120,7 +115,7 @@ int main(int, char**)
         shaderProgram.assignMat4("projectionMat", projectionMat, GL_FALSE);
 
         // Draw object
-        mesh.draw();
+        bunny.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

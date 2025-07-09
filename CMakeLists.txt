@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME}
     "src/shader.cpp"
     "src/camera.cpp"
     "src/mesh.cpp"
+    "src/model.cpp"
 )
 
 find_package(glad CONFIG REQUIRED)
