@@ -84,7 +84,7 @@ int main(int, char **)
     glfwSetKeyCallback(window, key_callback);
 
     // 3D Bunny
-    Model model("assets/Survival_BackPack_2.fbx");
+    Model model("assets/StanfordBunny.glb");
 
     // Create shader program
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
@@ -189,6 +189,8 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target)
 void assign_transforms(Shader &shader)
 {
     glm::mat4 modelMat = glm::mat4(1.0);
+    modelMat = glm::scale(modelMat, glm::vec3(0.05));
+    modelMat = glm::rotate(modelMat, static_cast<float>(glm::radians(90.f)), glm::vec3(1, 0, 0));
     glm::mat4 worldMat = glm::mat4(1.0);
     glm::mat4 viewMat = camera.getViewMatrix();
     glm::mat4 projectionMat = glm::mat4(1.0);

@@ -49,7 +49,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
         processNode(node->mChildren[i], scene);
 }
 
-// Copy mesh into model
+// Copy node's mesh into model
 void Model::extractMesh(aiMesh *nodeMesh, const aiScene *scene)
 {
     std::vector<Vertex> vertices;
@@ -91,5 +91,5 @@ void Model::extractMesh(aiMesh *nodeMesh, const aiScene *scene)
 
     // Add mesh to model
     Mesh newMesh(vertices, indices);
-    this->meshes.push_back(newMesh);
+    addMesh(newMesh);
 }
