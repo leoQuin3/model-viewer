@@ -6,7 +6,6 @@
 
 Model::Model(const std::string FILE_PATH)
 {
-    // TODO: Load model
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(FILE_PATH, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
     if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -35,24 +34,62 @@ void Model::addMesh(Mesh &mesh)
 
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
-    // Get all meshes
-    for (int i = 0; i < node->mNumMeshes; i++)
+    // Get meshes
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
+        // Obtain mesh
         unsigned int meshIndex = node->mMeshes[i];
         aiMesh* sceneMesh = scene->mMeshes[meshIndex];
 
-        // Obtain meshes
         extractMesh(sceneMesh, scene);
     }
 
     // Read through each children
-    for (int i = 0; i < node->mNumChildren; i++)
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
         processNode(node->mChildren[i], scene);
 }
 
-// TODO: Construct mesh and push into meshes vector
+// Copy mesh into model
 void Model::extractMesh(aiMesh *nodeMesh, const aiScene *scene)
 {
-    // DEBUG: print each mesh name
-    std::cout << nodeMesh->mName.C_Str() << "\n";
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    
+    // Get vertices
+    for (unsigned int i = 0; i < nodeMesh->mNumVertices; i++)
+    {
+        Vertex newVertex;
+        
+        // Copy positions 
+        aiVector3D meshPos = nodeMesh->mVertices[i];
+        glm::vec3 newPos;
+        newPos.x = meshPos.x;
+        newPos.y = meshPos.y;
+        newPos.z = meshPos.z;
+        newVertex.position = newPos;
+
+        // Copy normals
+        aiVector3D meshNorm = nodeMesh->mNormals[i];
+        glm::vec3 newNorm;
+        newNorm.x = meshNorm.x;
+        newNorm.y = meshNorm.y;
+        newNorm.z = meshNorm.z;
+        newVertex.normal = newNorm;
+
+        // Push to vertex list
+        vertices.push_back(newVertex);
+    }
+
+    // Get indices
+    for (unsigned int i = 0; i < nodeMesh->mNumFaces; i++)
+    {
+        aiFace face = nodeMesh->mFaces[i];
+
+        for (unsigned int j = 0; j < face.mNumIndices; j++)
+            indices.push_back(face.mIndices[j]);
+    }
+
+    // Add mesh to model
+    Mesh newMesh(vertices, indices);
+    this->meshes.push_back(newMesh);
 }

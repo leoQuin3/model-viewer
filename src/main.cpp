@@ -47,23 +47,23 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target);
 void assign_transforms(Shader &shader);
 
 // Callback functions
-void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-int main(int, char**)
+int main(int, char **)
 {
     // Initialize OpenGL
     if (!glfwInit())
-	{
+    {
         std::cout << "ERROR::Failed to initialize glfw.\n";
-		return EXIT_FAILURE;
-	}
+        return EXIT_FAILURE;
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Model Viewer", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Model Viewer", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR::Failed to create window.\n";
@@ -84,7 +84,7 @@ int main(int, char**)
     glfwSetKeyCallback(window, key_callback);
 
     // 3D Bunny
-    Model bunny("assets/StanfordBunny.glb");
+    Model model("assets/Survival_BackPack_2.fbx");
 
     // Create shader program
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
@@ -106,7 +106,7 @@ int main(int, char**)
         assign_transforms(shaderProgram);
 
         // Draw object
-        // bunny.draw();
+        model.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -120,14 +120,14 @@ int main(int, char**)
 
 // Rotate camera by dragging
 // FIXME: Camera rotating fine and smooth at 90 degrees, but snappy after panning. Check Camera's 'updateCameraVectors' method.
-void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
 {
     float xOffset = static_cast<float>(xpos) - lastMouseX;
     float yOffset = lastMouseY - static_cast<float>(ypos);
 
     lastMouseX = static_cast<float>(xpos);
     lastMouseY = static_cast<float>(ypos);
-    
+
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
         // Panning
@@ -151,8 +151,8 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 // Zoom by scrolling
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{   
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
     radius -= static_cast<float>(yoffset) * 0.5f;
 
     if (radius > MAX_RADIUS)
@@ -162,7 +162,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // Reset to default position
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_R)
     {
@@ -179,7 +179,7 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target)
     camera.position.x = radius * glm::cos(theta) * glm::sin(phi);
     camera.position.y = radius * glm::sin(theta);
     camera.position.z = radius * glm::cos(theta) * glm::cos(phi);
-    
+
     camera.position += target;
 
     camera.lookAtPosition(target);
