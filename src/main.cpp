@@ -44,6 +44,7 @@ Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(1, 0, -1), glm::vec3(
 // Prototypes
 unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
 void orbit_camera(const float theta, const float phi, const glm::vec3 target);
+void assign_transforms(Shader &shader);
 
 // Callback functions
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
@@ -101,18 +102,8 @@ int main(int, char**)
         // Update camera
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
 
-        // Vertex transformations
-        glm::mat4 modelMat = glm::mat4(1.0);
-        glm::mat4 worldMat = glm::mat4(1.0);
-        glm::mat4 viewMat = camera.getViewMatrix();
-        glm::mat4 projectionMat = glm::mat4(1.0);
-        projectionMat = glm::perspective(glm::radians(45.f), static_cast<float>(WINDOW_WIDTH) / (WINDOW_HEIGHT), 0.1f, 100.0f);
-
-        // Assign uniforms
-        shaderProgram.assignMat4("modelMat", modelMat, GL_FALSE);
-        shaderProgram.assignMat4("worldMat", worldMat, GL_FALSE);
-        shaderProgram.assignMat4("viewMat", viewMat, GL_FALSE);
-        shaderProgram.assignMat4("projectionMat", projectionMat, GL_FALSE);
+        // Update vertex transformations
+        assign_transforms(shaderProgram);
 
         // Draw object
         bunny.draw();
@@ -192,4 +183,20 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target)
     camera.position += target;
 
     camera.lookAtPosition(target);
+}
+
+// Assign vertex transformations to shader program
+void assign_transforms(Shader &shader)
+{
+    glm::mat4 modelMat = glm::mat4(1.0);
+    glm::mat4 worldMat = glm::mat4(1.0);
+    glm::mat4 viewMat = camera.getViewMatrix();
+    glm::mat4 projectionMat = glm::mat4(1.0);
+    projectionMat = glm::perspective(glm::radians(45.f), static_cast<float>(WINDOW_WIDTH) / (WINDOW_HEIGHT), 0.1f, 100.0f);
+
+    // Assign uniforms
+    shader.assignMat4("modelMat", modelMat, GL_FALSE);
+    shader.assignMat4("worldMat", worldMat, GL_FALSE);
+    shader.assignMat4("viewMat", viewMat, GL_FALSE);
+    shader.assignMat4("projectionMat", projectionMat, GL_FALSE);
 }
