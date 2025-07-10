@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <assimp/scene.h>
 #include "shader.h"
 #include "mesh.h"
 
@@ -16,4 +17,7 @@ public:
 private:
     std::vector<Mesh> meshes;
     std::string directory;
+
+    void processNode(aiNode* node, const aiScene* scene);
+    void extractMesh(aiMesh* nodeMesh, const aiScene* scene);
 };

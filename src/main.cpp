@@ -106,7 +106,7 @@ int main(int, char**)
         assign_transforms(shaderProgram);
 
         // Draw object
-        bunny.draw();
+        // bunny.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
