@@ -88,25 +88,49 @@ int main(int, char **)
 
     // Create shader program
     Shader shaderProgram("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
-    shaderProgram.use();
+    Shader outlineShader("shaders/vtx_shader.glsl", "shaders/outline_shader.glsl");
 
     // Enable properties
-    glEnable(GL_DEPTH_TEST);
     camera.mouseSensitivity = 0.005f;
+    glEnable(GL_DEPTH_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.f, 0.f, 0.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         // Update camera
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
 
-        // Update vertex transformations
+        // Draw model
+        // -----------------------------------------------------------------------
+        glEnable(GL_STENCIL_TEST);  // Allow writing to stencil buffer
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Take in all stencil values
+
+        shaderProgram.use();
         assign_transforms(shaderProgram);
 
-        // Draw object
         model.draw();
+
+        // Draw outline
+        // -----------------------------------------------------------------------
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);    // Only draw where stencil value
+                                                // is NOT 1 (i.e. anywhere except
+                                                // where the rabbit is drawn).
+
+        glDisable(GL_DEPTH_TEST);   // Draw on top of everything
+        
+        outlineShader.use();
+        assign_transforms(outlineShader);
+        glm::mat4 modelMat = glm::mat4(1.0);    // HACK: overwriting model matrix to make the object bigger
+        modelMat = glm::scale(modelMat, glm::vec3(0.052));
+        modelMat = glm::rotate(modelMat, static_cast<float>(glm::radians(90.f)), glm::vec3(1, 0, 0));
+        outlineShader.assignMat4("modelMat", modelMat, GL_FALSE);
+
+        model.draw();   // Draw outline!
+
+        glEnable(GL_DEPTH_TEST);// Enable depth testing again
 
         glfwSwapBuffers(window);
         glfwPollEvents();
