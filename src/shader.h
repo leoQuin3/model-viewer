@@ -14,7 +14,8 @@ public:
 	~Shader();
 	
 	void use();
-	void assignMat4(const std::string uniformName, const glm::mat4 &mat4, GLboolean transpose);
+	void assignMat4(const std::string &uniformName, const glm::mat4 &mat4, GLboolean transpose);
+	void assignFloat(const std::string &uniformName, float value);
 
 private:
 	void printShaderCompileStatus(GLuint id, std::string name);
