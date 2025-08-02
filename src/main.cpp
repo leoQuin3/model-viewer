@@ -12,7 +12,9 @@
 #include "model.h"
 
 /*
-    TODO NEXT: Create a mirror effect using stencil buffer!
+    TODO: Create mirror using stencil testing
+        -   Write to stencil buffer
+        -   Draw reflection in the mirror
 */
 
 // Window and cursor properties
@@ -39,10 +41,8 @@ glm::vec3 panOffset(0.f);
 Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(1, 0, -1), glm::vec3(0, 1, 0));
 
 // Prototypes
-unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
 void orbit_camera(const float theta, const float phi, const glm::vec3 target);
 void assign_transforms(Shader &shader);
-void draw_outlined(Model &model, float outlineScale, Shader &modelShader, Shader &outlineShader);
 
 // Callback functions
 void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
@@ -86,12 +86,10 @@ int main(int, char **)
 
     // Create shader program
     Shader modelShader("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
-    Shader outlineShader("shaders/vtx_outline_shader.glsl", "shaders/frag_outline_shader.glsl");
 
     // Enable properties
     camera.mouseSensitivity = 0.005f;
     glEnable(GL_DEPTH_TEST);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -101,8 +99,9 @@ int main(int, char **)
         // Update camera
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
 
-        // Draw outlined model
-        draw_outlined(model, 1.f, modelShader, outlineShader);
+        // Draw rabbit
+
+        // TODO: Create a reflection using stencil buffer
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -115,7 +114,6 @@ int main(int, char **)
 }
 
 // Rotate camera by dragging
-// FIXME: Camera rotating fine and smooth at 90 degrees, but snappy after panning. Check Camera's 'updateCameraVectors' method.
 void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
 {
     float xOffset = static_cast<float>(xpos) - lastMouseX;
@@ -185,8 +183,6 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target)
 void assign_transforms(Shader &shader)
 {
     glm::mat4 modelMat = glm::mat4(1.0);
-    modelMat = glm::scale(modelMat, glm::vec3(0.05));
-    modelMat = glm::rotate(modelMat, static_cast<float>(glm::radians(90.f)), glm::vec3(1, 0, 0));
     glm::mat4 worldMat = glm::mat4(1.0);
     glm::mat4 viewMat = camera.getViewMatrix();
     glm::mat4 projectionMat = glm::mat4(1.0);
@@ -199,28 +195,29 @@ void assign_transforms(Shader &shader)
     shader.assignMat4("projectionMat", projectionMat, GL_FALSE);
 }
 
-void draw_outlined(Model &model, float outlineScale, Shader &modelShader, Shader &outlineShader)
-{
-    // Draw model
-    // -----------------------------------------------------------------------
-    glEnable(GL_STENCIL_TEST);  // Allow writing to stencil buffer
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Pass all fragments
+// NOTE: Kept here for reference
+// void draw_outlined(Model &model, float outlineScale, Shader &modelShader, Shader &outlineShader)
+// {
+//     // Draw model
+//     // -----------------------------------------------------------------------
+//     glEnable(GL_STENCIL_TEST);  // Allow writing to stencil buffer
+//     glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Pass all fragments
 
-    modelShader.use();
-    assign_transforms(modelShader);
-    model.draw();
+//     modelShader.use();
+//     assign_transforms(modelShader);
+//     model.draw();
 
-    // Draw outline
-    // -----------------------------------------------------------------------
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);    // Only draw where stencil value
-                                            // is NOT 1 (i.e. anywhere except
-                                            // where the rabbit is drawn).
-    glDisable(GL_DEPTH_TEST);   // Draw on top of everything
+//     // Draw outline
+//     // -----------------------------------------------------------------------
+//     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);    // Only draw where stencil value
+//                                             // is NOT 1 (i.e. anywhere except
+//                                             // where the rabbit is drawn).
+//     glDisable(GL_DEPTH_TEST);   // Draw on top of everything
     
-    outlineShader.use();
-    assign_transforms(outlineShader);
-    outlineShader.assignFloat("outlineScale", outlineScale);
-    model.draw();
+//     outlineShader.use();
+//     assign_transforms(outlineShader);
+//     outlineShader.assignFloat("outlineScale", outlineScale);
+//     model.draw();
 
-    glEnable(GL_DEPTH_TEST);    // Re-enable depth testing
-}
+//     glEnable(GL_DEPTH_TEST);    // Re-enable depth testing
+// }
