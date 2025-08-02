@@ -108,22 +108,30 @@ int main(int, char **)
     // Enable properties
     camera.mouseSensitivity = 0.005f;
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // Replace values with 1 where mirror is drawn
 
+    // Activate shader program
+    modelShader.use();
+    
     while (!glfwWindowShouldClose(window))
     {
+        glClearStencil(0);
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+        
         // Update camera
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
 
-        // Draw rabbit
-        modelShader.use();
         assign_transforms(modelShader);
-        model.draw();
 
         // TODO: Create a reflection using stencil buffer
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Pass all fragments
         mirror.draw();
+        
+        // TEST: Draw rabbit "inside" mirror
+        glStencilFunc(GL_EQUAL, 1, 0xFF);    // Draw only where 1
+        model.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
