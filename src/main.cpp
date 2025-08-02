@@ -84,6 +84,24 @@ int main(int, char **)
     // 3D Bunny
     Model model("assets/StanfordBunny.glb");
 
+    // Mirror Model
+    Mesh mirror(
+
+        // Vertices
+        std::vector<Vertex>
+        {
+            {glm::vec3(-2.5f, -2.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)},
+            {glm::vec3( 2.5f, -2.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)},
+            {glm::vec3( 2.5f,  2.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)},
+            {glm::vec3(-2.5f,  2.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)}
+        },
+
+        // Indices
+        {
+            0, 1, 2, 2, 3, 0
+        }
+    );
+
     // Create shader program
     Shader modelShader("shaders/vtx_shader.glsl", "shaders/frag_shader.glsl");
 
@@ -100,8 +118,12 @@ int main(int, char **)
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
 
         // Draw rabbit
+        modelShader.use();
+        assign_transforms(modelShader);
+        model.draw();
 
         // TODO: Create a reflection using stencil buffer
+        mirror.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
