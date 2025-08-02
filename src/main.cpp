@@ -42,7 +42,7 @@ Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(1, 0, -1), glm::vec3(
 
 // Prototypes
 void orbit_camera(const float theta, const float phi, const glm::vec3 target);
-void assign_transforms(Shader &shader);
+void assign_transforms(Shader &shader, float scale, glm::vec3 position);
 
 // Callback functions
 void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
@@ -110,27 +110,30 @@ int main(int, char **)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // Replace values with 1 where mirror is drawn
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // Activate shader program
     modelShader.use();
     
     while (!glfwWindowShouldClose(window))
     {
-        glClearStencil(0);
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         
         // Update camera
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
-
-        assign_transforms(modelShader);
-
+        
         // TODO: Create a reflection using stencil buffer
         glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Pass all fragments
+        glDisable(GL_DEPTH_TEST);
+        assign_transforms(modelShader, 1.f, glm::vec3(0));
         mirror.draw();
         
         // TEST: Draw rabbit "inside" mirror
         glStencilFunc(GL_EQUAL, 1, 0xFF);    // Draw only where 1
+        glEnable(GL_DEPTH_TEST);
+        assign_transforms(modelShader, 1.f, glm::vec3(0, 0, -3));
         model.draw();
 
         glfwSwapBuffers(window);
@@ -210,15 +213,19 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target)
 }
 
 // Assign vertex transformations to shader program
-void assign_transforms(Shader &shader)
+void assign_transforms(Shader &shader, float scale, glm::vec3 position)
 {
     glm::mat4 modelMat = glm::mat4(1.0);
+    modelMat = glm::scale(modelMat, glm::vec3(scale));
+
     glm::mat4 worldMat = glm::mat4(1.0);
+    worldMat = glm::translate(worldMat, position);
+
     glm::mat4 viewMat = camera.getViewMatrix();
+
     glm::mat4 projectionMat = glm::mat4(1.0);
     projectionMat = glm::perspective(glm::radians(45.f), static_cast<float>(WINDOW_WIDTH) / (WINDOW_HEIGHT), 0.1f, 100.0f);
 
-    // Assign uniforms
     shader.assignMat4("modelMat", modelMat, GL_FALSE);
     shader.assignMat4("worldMat", worldMat, GL_FALSE);
     shader.assignMat4("viewMat", viewMat, GL_FALSE);
