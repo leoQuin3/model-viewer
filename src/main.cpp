@@ -50,6 +50,13 @@ void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
+/*
+
+TODO:
+    1)  Move mirroring transformations to a shader.
+    3)  Refactor code.
+*/
+
 int main(int, char **)
 {
     // Initialize OpenGL
@@ -127,24 +134,29 @@ int main(int, char **)
         orbit_camera(elevationAngle, azimuthAngle, WORLD_ORIGIN + panOffset);
         
         // Draw mirror
-        glEnable(GL_STENCIL_TEST);
-        glEnable(GL_CULL_FACE);
+        glEnable(GL_STENCIL_TEST);  // Enable stencil testing
+        glEnable(GL_CULL_FACE); // Only draw on one side
         glDisable(GL_DEPTH_TEST);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Pass all fragments
         assign_transforms(modelShader, 1.f, glm::vec3(0));
         mirror.draw();
         
+        // Model position
+        glm::vec3 modelPosition = glm::vec3(0, 0, -5);
+        modelPosition.x += glm::cos(glfwGetTime());
+        modelPosition.y += glm::cos(glfwGetTime());
+        modelPosition.z -= glm::sin(glfwGetTime()) * 2;
+
         // Draw reflection
-        // TODO: Maybe use shaders to mirror rabbit?
         glStencilFunc(GL_EQUAL, 1, 0xFF);    // Draw only where 1
         glEnable(GL_DEPTH_TEST);
-        assign_transforms(modelShader, 1.f, glm::vec3(0, 0, -3));
+        assign_transforms(modelShader, 1.f, modelPosition);
         model.draw();
 
         // Draw rabbit
         glDisable(GL_STENCIL_TEST);
         glDisable(GL_CULL_FACE);
-        assign_mirrored_transforms(modelShader, 1.f, glm::vec3(0, 0, -3));
+        assign_mirrored_transforms(modelShader, 1.f, modelPosition);
         model.draw();
 
         glfwSwapBuffers(window);
