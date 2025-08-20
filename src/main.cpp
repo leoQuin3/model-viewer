@@ -153,7 +153,6 @@ int main(int, char **)
 
         modelShader.use();
         assign_transforms(modelShader, 1.f, modelPosition, rotateAxis, angle);
-        std::cout << cos(glfwGetTime()) << std::endl;
         model.draw();
 
         glfwSwapBuffers(window);
