@@ -12,7 +12,15 @@ uniform mat4 projectionMat;
 
 void main()
 {
-    gl_Position = projectionMat * viewMat * worldMat * modelMat * vec4(aPos, 1);
+    // Mirror matrix across z axis
+    mat4 mirrorMat = mat4(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0,-1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    );
+
+    gl_Position = projectionMat * viewMat * mirrorMat * worldMat * modelMat * vec4(aPos, 1);
 
     vertexColor = (transpose(inverse(modelMat)) * vec4(aNorm, 0));
 }
