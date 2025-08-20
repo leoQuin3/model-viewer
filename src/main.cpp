@@ -11,12 +11,6 @@
 #include "mesh.h"
 #include "model.h"
 
-/*
-    TODO: Create mirror using stencil testing
-        -   Write to stencil buffer
-        -   Draw reflection in the mirror
-*/
-
 // Window and cursor properties
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
@@ -113,11 +107,8 @@ int main(int, char **)
 
     // Enable properties
     camera.mouseSensitivity = 0.005f;
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // Replace values with 1 where mirror is drawn
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glCullFace(GL_BACK);    // Flip culling for mirror
     
     // GPU-side mirror effect using vertex shader!
     while (!glfwWindowShouldClose(window))
@@ -263,30 +254,3 @@ void assign_transforms(Shader &shader, float scale, glm::vec3 position, glm::vec
     shader.assignMat4("viewMat", viewMat, GL_FALSE);
     shader.assignMat4("projectionMat", projectionMat, GL_FALSE);
 }
-
-// NOTE: Kept here for reference
-// void draw_outlined(Model &model, float outlineScale, Shader &modelShader, Shader &outlineShader)
-// {
-//     // Draw model
-//     // -----------------------------------------------------------------------
-//     glEnable(GL_STENCIL_TEST);  // Allow writing to stencil buffer
-//     glStencilFunc(GL_ALWAYS, 1, 0xFF);  // Pass all fragments
-
-//     modelShader.use();
-//     assign_transforms(modelShader);
-//     model.draw();
-
-//     // Draw outline
-//     // -----------------------------------------------------------------------
-//     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);    // Only draw where stencil value
-//                                             // is NOT 1 (i.e. anywhere except
-//                                             // where the rabbit is drawn).
-//     glDisable(GL_DEPTH_TEST);   // Draw on top of everything
-    
-//     outlineShader.use();
-//     assign_transforms(outlineShader);
-//     outlineShader.assignFloat("outlineScale", outlineScale);
-//     model.draw();
-
-//     glEnable(GL_DEPTH_TEST);    // Re-enable depth testing
-// }
