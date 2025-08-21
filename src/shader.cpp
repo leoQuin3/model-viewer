@@ -72,10 +72,16 @@ void Shader::use()
     glUseProgram(this->id);
 }
 
-void Shader::assignMat4(const std::string uniformName, const glm::mat4 &mat4, GLboolean transpose)
+void Shader::assignMat4(const std::string &uniformName, const glm::mat4 &mat4, GLboolean transpose)
 {
     const GLchar* unifName_c = uniformName.c_str();
     glUniformMatrix4fv(glGetUniformLocation(this->id, unifName_c), 1, transpose, glm::value_ptr(mat4));
+}
+
+void Shader::assignFloat(const std::string &uniformName, float value)
+{
+    const GLchar* unifName_c = uniformName.c_str();
+    glUniform1f(glGetUniformLocation(this->id, unifName_c), static_cast<GLfloat>(value));
 }
 
 void Shader::printShaderCompileStatus(GLuint id, std::string name)

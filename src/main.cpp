@@ -11,13 +11,6 @@
 #include "mesh.h"
 #include "model.h"
 
-/*
-    TODO: Import 3D model
-    -   Use assimp to get vertices
-    -   Buffer model
-    -   Render it
-*/
-
 // Window and cursor properties
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
@@ -42,7 +35,6 @@ glm::vec3 panOffset(0.f);
 Camera camera = Camera(WORLD_ORIGIN + panOffset, glm::vec3(1, 0, -1), glm::vec3(0, 1, 0));
 
 // Prototypes
-unsigned int getVertCount(unsigned int arrLength, unsigned int stride);
 void orbit_camera(const float theta, const float phi, const glm::vec3 target);
 void assign_transforms(Shader &shader);
 
@@ -119,7 +111,6 @@ int main(int, char **)
 }
 
 // Rotate camera by dragging
-// FIXME: Camera rotating fine and smooth at 90 degrees, but snappy after panning. Check Camera's 'updateCameraVectors' method.
 void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
 {
     float xOffset = static_cast<float>(xpos) - lastMouseX;
@@ -189,8 +180,6 @@ void orbit_camera(const float theta, const float phi, const glm::vec3 target)
 void assign_transforms(Shader &shader)
 {
     glm::mat4 modelMat = glm::mat4(1.0);
-    modelMat = glm::scale(modelMat, glm::vec3(0.05));
-    modelMat = glm::rotate(modelMat, static_cast<float>(glm::radians(90.f)), glm::vec3(1, 0, 0));
     glm::mat4 worldMat = glm::mat4(1.0);
     glm::mat4 viewMat = camera.getViewMatrix();
     glm::mat4 projectionMat = glm::mat4(1.0);
