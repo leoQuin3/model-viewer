@@ -13,5 +13,7 @@ uniform mat4 projectionMat;
 void main()
 {
     gl_Position = projectionMat * viewMat * worldMat * modelMat * vec4(aPos, 1.0);
-    vertexColor = vec4(aNorm, 1.0);
+
+    vec4 newNorm = transpose(inverse(modelMat)) * vec4(aNorm, 0);
+    vertexColor = normalize(newNorm) * 0.5 + vec4(0.5, 0.5, 0.5, 1);
 }
