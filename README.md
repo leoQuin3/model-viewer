@@ -2,6 +2,9 @@
 
 A program that loads and renders 3D models, written in C++ and OpenGL. 
 
+<img src="./screenshots/modelviewer_rabbit1.png" width="300" alt="Rabbit model"/>
+<img src="./screenshots/modelviewer_rabbit2.png" width="300" alt="Mirror effect using stencil buffer"/>
+
 This is a project where I learned concepts in OpenGL and computer graphics theory. So far, I learned vertex buffers, coordinate transformations, and OpenGL's tests (depth, stencil, etc.).
 
 The `main` branch contains boilerplate code. Every branch (eg. `experimental/stencil-testing`) is built on top of `main`, exploring a concept or implementing a feature.
