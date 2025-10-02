@@ -44,10 +44,10 @@ cd build/debug
 ## Building on Windows:
 > NOTE: Visual Studio is recommended. Building on Windows may also lead to issues due to package build failures (eg. Assimp).
 1. Install prerequisites:
-- Visual Studio 2019+
-- Git
-- CMake 3.15+
-- OpenGL 3.0+
+	- Visual Studio 2019+
+	- Git
+	- CMake 3.15+
+	- OpenGL 3.0+
 2. Clone repo:
 ```bash 
 git clone https://github.com/leoQuin3/model-viewer.git
